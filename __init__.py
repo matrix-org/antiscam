@@ -1,0 +1,3 @@
+from AntiScamSpamChecker import AntiScamSpamChecker
+
+
