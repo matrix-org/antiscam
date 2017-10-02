@@ -120,7 +120,4 @@ cli_greenlet = gevent.spawn(cli.run)
 
 gevent.joinall([http_greenlet, cli_greenlet])
 
-#while True:
-#    print("snoooooze")
-#    gevent.sleep(1)
 
