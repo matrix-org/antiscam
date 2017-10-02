@@ -17,9 +17,10 @@
 
 import re
 import logging
+import ujson as json
 
 from twisted.internet import reactor, defer
-from twisted.web.client import Agent
+from twisted.web.client import Agent, readBody
 
 logger = logging.getLogger(__name__)
 
@@ -31,13 +32,38 @@ class AntiScamSpamChecker(object):
 
         self.agent = Agent(reactor)
 
-        self.Settings = {}
-        self.Settings['URL_WhiteList'] = ['github.com','reddit.com','etherscan.io','myetherwallet.com',
+        self.settings = {}
+        self.settings['url_whitelist'] = ['github.com','reddit.com','etherscan.io','myetherwallet.com',
                                           '0xproject.com','numer.ai','twitter.com','slack.com',
                                           'medium.com', 'ethplorer.io', 'metamask.io', 'steemit.com', 
                                           'youtube.com','hackingdistributed.com','ens.domains','bittrex.com',
                                           'consensys.net','forbes.com','coinmarketcap.com','liqui.io',
                                           'hitbtc.com']
+        self.settings.update(config)
+
+        reactor.callWhenRunning(self.update_settings)
+
+    @defer.inlineCallbacks
+    def update_settings(self):
+        url = None
+        try:
+            url = self.settings['bot_urlbase'] + 'settings.json'
+        except:
+            logger.error("No 'bot_urlbase' specified: can't update settings")
+
+        try:
+            logger.debug("updating settings from %s", url)
+            response = yield self.agent.request(
+                'GET', url, None, None,
+            )
+            body = yield readBody(response)
+            settings = json.loads(body)
+            logger.debug("got new settings: %r", settings)
+            self.settings.update(settings)
+        except Exception as e:
+            logger.error("Failed to update settings: %r", e)
+        finally:
+            reactor.callLater(60, self.update_settings)
 
     @staticmethod
     def parse_config(config):
@@ -47,12 +73,32 @@ class AntiScamSpamChecker(object):
         if not hasattr(event, "content") or "body" not in event.content:
             return False
 
+        if self.isAdmin(event.sender) or self.isMod(event.sender):
+            return False
+
         if self.isETH_BTC(event):
             return True
         elif self.isBadURL(event):
             return True
 
         return False
+
+    def isAdmin(self, userId):
+        if 'admin' not in self.settings:
+            print("no admin setting")
+            return False
+        print("admin is %r" % (self.settings['admin'],))
+        return userId == self.settings['admin']
+
+    def isMod(self, userid):
+        if 'mods' not in self.settings:
+            return False
+
+        mods = self.settings['mods']
+        if mods is None:
+            mods = []
+
+        return userid in mods
 
     def isETH_BTC(self, event):
         'Detect events that contain ETH/BTC addresses'
@@ -153,7 +199,7 @@ class AntiScamSpamChecker(object):
             logger.debug('%r: URL detected at {}'.format(domain), event.event_id)
 
             #If domain is not in whitelist
-            if not domain in self.Settings['URL_WhiteList']:
+            if not domain in self.settings['url_whitelist']:
 
                 #Channel with new moderator
                 #contactChan = self.scBot.api_call('im.open', user = userID)['channel']['id']
