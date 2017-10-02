@@ -57,11 +57,9 @@ class MatrixClient(object):
             try:
                 sync = self.sync()
                 self.process_sync(sync)
-            #except Exception as e:
-            #    logger.warn("sync failed: %r", e)
-            #    gevent.sleep(5)
-            finally:
-                pass
+            except Exception as e:
+                logger.warn("sync failed: %r", e)
+                gevent.sleep(5)
 
     def sync(self):
         print("syncing")
