@@ -1,4 +1,5 @@
 import logging
+import sys
 
 from gevent.pywsgi import WSGIServer
 import gevent
@@ -108,7 +109,15 @@ class BotHandler(object):
 
 logging.basicConfig()
 
-tok = 'MDAxN2xvY2F0aW9uIGxvY2FsaG9zdAowMDEzaWRlbnRpZmllciBrZXkKMDAxMGNpZCBnZW4gPSAxCjAwMjJjaWQgdXNlcl9pZCA9IEB0ZXN0OmxvY2FsaG9zdAowMDE2Y2lkIHR5cGUgPSBhY2Nlc3MKMDAyMWNpZCBub25jZSA9IHdMYTZ1Tm11eTkwZnZJbjMKMDAyZnNpZ25hdHVyZSDW7gBbZudh-bwjyo9X6WOr0XuyZ6mygbgnZ4GeO2_HzAo'
+private_settings = {}
+
+try:
+    with open('privsettings.yaml') as f:
+        private_settings = yaml.load(f)
+    tok = private_settings['token']
+except:
+    print("Failed to load token from privsettings.yaml")
+    sys.exit(1)
 
 
 http_server = WSGIServer(('localhost', 7000), app)
@@ -119,5 +128,4 @@ cli.handler = BotHandler(cli)
 cli_greenlet = gevent.spawn(cli.run)
 
 gevent.joinall([http_greenlet, cli_greenlet])
-
 
