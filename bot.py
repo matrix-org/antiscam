@@ -111,7 +111,7 @@ logging.basicConfig()
 tok = 'MDAxN2xvY2F0aW9uIGxvY2FsaG9zdAowMDEzaWRlbnRpZmllciBrZXkKMDAxMGNpZCBnZW4gPSAxCjAwMjJjaWQgdXNlcl9pZCA9IEB0ZXN0OmxvY2FsaG9zdAowMDE2Y2lkIHR5cGUgPSBhY2Nlc3MKMDAyMWNpZCBub25jZSA9IHdMYTZ1Tm11eTkwZnZJbjMKMDAyZnNpZ25hdHVyZSDW7gBbZudh-bwjyo9X6WOr0XuyZ6mygbgnZ4GeO2_HzAo'
 
 
-http_server = WSGIServer(('', 7000), app)
+http_server = WSGIServer(('localhost', 7000), app)
 http_greenlet = gevent.spawn(http_server.serve_forever)
 
 cli = MatrixClient('http://localhost:8008/', tok)
