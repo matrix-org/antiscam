@@ -21,6 +21,9 @@ class BotHandler(object):
         if ev['content']['body'].startswith('$'):
             self.process_command(roomid, ev['sender'], ev['content']['body'])
 
+    def on_room_invite(self, roomid, room):
+        self.cli.join_room(roomid)
+
     def process_command(self, roomid, userid, cmd):
         parts = cmd.split(' ')
         if parts[0] == '$url':

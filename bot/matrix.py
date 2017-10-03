@@ -52,6 +52,21 @@ class MatrixClient(object):
             'body': text,
         })
 
+    def join_room(self, roomid):
+        url = self.base_url + (
+            '_matrix/client/r0/join/%s?access_token=%s' % (
+                roomid, self.access_token,
+            )
+        )
+        req = grequests.post(url, json={})
+        req.send()
+        if req.response is None:
+            raise Exception("Request failed")
+        elif req.response.status_code / 100 != 2:
+            raise Exception("Request failed with code %r" % req.response.status_code)
+        else:
+            return True
+
     def run(self):
         while True:
             try:
@@ -91,4 +106,6 @@ class MatrixClient(object):
         for roomid, room in sync['rooms']['join'].iteritems():
             for ev in room['timeline']['events']:
                 self.handler.on_room_event(roomid, ev)
+        for roomid, room in sync['rooms']['invite'].iteritems():
+                self.handler.on_room_invite(roomid, room)
 
