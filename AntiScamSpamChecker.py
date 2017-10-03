@@ -84,7 +84,7 @@ class AntiScamSpamChecker(object):
         return False
 
     def user_may_invite(self, userid):
-        return self.isAdmin(user) or self.isMod(userid)
+        return self.isAdmin(userid) or self.isMod(userid)
 
     def isAdmin(self, userid):
         if 'admins' not in self.settings:
