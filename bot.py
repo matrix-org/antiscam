@@ -1,5 +1,6 @@
 import logging
 import sys
+import yaml
 
 from gevent.pywsgi import WSGIServer
 import gevent
