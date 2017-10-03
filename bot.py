@@ -78,7 +78,11 @@ class BotHandler(object):
 
         settings = bot.settings.get()
 
-        if 'admin' not in settings or userid != settings['admin']:
+        admins = []
+        if 'admins' in settings:
+            admins = settings['admins']
+
+        if userid not in admins:
             cli.send_plaintext_notice(roomid, "mods command only usable by admin")
             return
 
@@ -105,7 +109,7 @@ class BotHandler(object):
             if len(args) < 2:
                 cli.send_plaintext_notice(roomid, "$mods remove @user:example.com")
                 return
-            whitelist.remove(args[1])
+            mods.remove(args[1])
             bot.settings.save()
             cli.send_plaintext_notice(roomid, "%s is no longer a moderator" % (args[1],))
             

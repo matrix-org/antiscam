@@ -77,11 +77,12 @@ class MatrixClient(object):
                 gevent.sleep(5)
 
     def sync(self):
-        print("syncing")
         url = self.base_url + '_matrix/client/r0/sync'
         if self.next_batch is not None:
+            print("syncing")
             url += '?since='+self.next_batch+'&timeout=30000'
         else:
+            print("initial syncing")
             url += '?filter=' + json.dumps({
                 'room': {
                     'timeline': {
@@ -92,6 +93,9 @@ class MatrixClient(object):
         url += '&access_token='+self.access_token
         req = grequests.get(url)
         req.send()
+        if self.next_batch is None:
+            print("done!")
+
         if req.response is None:
             raise Exception("sync request failed: response was None")
         elif req.response.status_code / 100 != 2:
