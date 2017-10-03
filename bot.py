@@ -33,7 +33,7 @@ class BotHandler(object):
 
     def handle_url(self, roomid, userid, args):
         if len(args) < 1:
-            cli.send_plaintext_notice(roomid, "url command required arguments")
+            cli.send_plaintext_notice(roomid, "url command requires arguments")
             return
 
         settings = bot.settings.get()
@@ -77,7 +77,7 @@ class BotHandler(object):
 
     def handle_mods(self, roomid, userid, args):
         if len(args) < 1:
-            cli.send_plaintext_notice(roomid, "mods command required arguments")
+            cli.send_plaintext_notice(roomid, "mods command requires arguments")
             return
 
         settings = bot.settings.get()
