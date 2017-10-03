@@ -38,7 +38,11 @@ class BotHandler(object):
 
         settings = bot.settings.get()
 
-        if 'admin' not in settings or userid != settings['admin']:
+        admins = []
+        if 'admins' in settings:
+            admins = settings['admins']
+
+        if userid not in admins:
             cli.send_plaintext_notice(roomid, "url command only usable by admin")
             return
             
