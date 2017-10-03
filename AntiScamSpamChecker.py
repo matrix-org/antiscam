@@ -73,7 +73,7 @@ class AntiScamSpamChecker(object):
         if not hasattr(event, "content") or "body" not in event.content:
             return False
 
-        if self.isAdmin(event.sender) or self.isMod(event.sender):
+        if self.isAdmin(event.sender) or self.isMod(event.sender) or self.isBot(event.sender):
             return False
 
         if self.isETH_BTC(event):
@@ -84,7 +84,7 @@ class AntiScamSpamChecker(object):
         return False
 
     def user_may_invite(self, userid):
-        return self.isAdmin(userid) or self.isMod(userid)
+        return self.isAdmin(userid) or self.isMod(userid) or self.isBot(userid)
 
     def isAdmin(self, userid):
         if 'admins' not in self.settings:
@@ -106,6 +106,12 @@ class AntiScamSpamChecker(object):
             mods = []
 
         return userid in mods
+
+    def isBot(self, userid):
+        if 'botuser' not in self.settings:
+            return False
+
+        return userid == self.settings['botuser']
 
     def isETH_BTC(self, event):
         'Detect events that contain ETH/BTC addresses'
