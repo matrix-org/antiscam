@@ -83,7 +83,7 @@ class AntiScamSpamChecker(object):
 
         return False
 
-    def user_may_invite(self, userid):
+    def user_may_invite(self, userid, roomid):
         return self.isAdmin(userid) or self.isMod(userid) or self.isBot(userid)
 
     def isAdmin(self, userid):
