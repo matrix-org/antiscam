@@ -92,6 +92,9 @@ class AntiScamSpamChecker(object):
     def user_may_create_room_alias(self, userid, room_alias):
         return self.isAdmin(userid) or self.isMod(userid) or self.isBot(userid)
 
+    def user_may_publish_room(self, userid, room_alias):
+        return self.isAdmin(userid) or self.isMod(userid) or self.isBot(userid)
+
     def isAdmin(self, userid):
         if 'admins' not in self.settings:
             logger.warn("No admins in config file")
