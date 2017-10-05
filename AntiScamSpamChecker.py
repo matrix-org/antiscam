@@ -83,11 +83,19 @@ class AntiScamSpamChecker(object):
 
         return False
 
-    def user_may_invite(self, userid, roomid):
-        return self.isAdmin(userid) or self.isMod(userid) or self.isBot(userid)
+    def user_may_invite(self, inviter_userid, invitee_userid, roomid):
+        return (
+            self.isAdmin(inviter_userid) or
+            self.isMod(inviter_userid) or
+            self.isBot(inviter_userid) or
+            self.isAdmin(invitee_userid) or
+            self.isMod(invitee_userid) or
+            self.isBot(invitee_userid)
+        )
 
     def user_may_create_room(self, userid):
-        return self.isAdmin(userid) or self.isMod(userid) or self.isBot(userid)
+        #return self.isAdmin(userid) or self.isMod(userid) or self.isBot(userid)
+        return True
 
     def user_may_create_room_alias(self, userid, room_alias):
         return self.isAdmin(userid) or self.isMod(userid) or self.isBot(userid)
