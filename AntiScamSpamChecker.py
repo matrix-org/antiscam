@@ -76,10 +76,12 @@ class AntiScamSpamChecker(object):
         if self.isAdmin(event.sender) or self.isMod(event.sender) or self.isBot(event.sender):
             return False
 
+        bad_domains = self.badURLDomains(event)
+
         if self.isETH_BTC(event):
-            return True
-        elif self.isBadURL(event):
-            return True
+            return "Wallet addresses are not permitted"
+        elif bad_domains:
+            return "Message contains links to prohibited domains: %s" % (','.join(bad_domains),)
 
         return False
 
@@ -215,13 +217,15 @@ class AntiScamSpamChecker(object):
 
         return False
 
-    def isBadURL(self, event):
+    def badURLDomains(self, event):
         # Regex for URLs taken from PhABC/antiScamBot_slack
         #REGEX expression
         regex = r"(?:[-a-zA-Z0-9@:%_\+~.#=]{2,256}\.)?([-a-zA-Z0-9@:%_\+~#=]*\.[a-z]{2,12})\b(?:[-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)"
 
         #Regular expression for URLs
         urls = re.findall(regex, event.content['body'])
+
+        bad_domains = []
 
         #If URL is found
         for domain in urls:
@@ -247,6 +251,6 @@ class AntiScamSpamChecker(object):
                 #Deleting message
                 #self.delete(data)
 
-                return True
+                bad_domains.append(domain)
 
-        return False
+        return bad_domains
