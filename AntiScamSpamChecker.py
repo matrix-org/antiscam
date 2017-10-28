@@ -220,7 +220,9 @@ class AntiScamSpamChecker(object):
     def badURLDomains(self, event):
         # Regex for URLs taken from PhABC/antiScamBot_slack
         #REGEX expression
-        regex = r"(?:[-a-zA-Z0-9@:%_\+~.#=]{2,256}\.)?([-a-zA-Z0-9@:%_\+~#=]*\.[a-z]{2,12})\b(?:[-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)"
+        #regex = r"(?:[-a-zA-Z0-9@:%_\+~.#=]{2,256}\.)?([-a-zA-Z0-9@:%_\+~#=]*\.[a-z]{2,12})\b(?:[-a-zA-Z0-9@:%_\+.~#?&\/\/=]*)"
+        # removes colons & @ to avoid matching user IDs
+        regex = r"(?:[-a-zA-Z0-9%_\+~.#=]{2,256}\.)?([-a-zA-Z0-9%_\+~#=]*\.[a-z]{2,12})\b(?:[-a-zA-Z0-9%_\+.~#?&\/\/=]*)"
 
         #Regular expression for URLs
         urls = re.findall(regex, event.content['body'])
