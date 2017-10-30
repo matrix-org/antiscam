@@ -22,6 +22,17 @@ import ujson as json
 from twisted.internet import reactor, defer
 from twisted.web.client import Agent, readBody
 
+# List of things we assume are file extensions and not TLDs
+# ie. so we can allow image.png but block evil.com
+FILE_EXTENSIONS = [
+    'png',
+    'jpg',
+    'jpeg',
+    'gif',
+    'mp4',
+    'pdf',
+]
+
 logger = logging.getLogger(__name__)
 
 class AntiScamSpamChecker(object):
@@ -229,14 +240,20 @@ class AntiScamSpamChecker(object):
 
         bad_domains = []
 
+        lower_domains = list([d.lower() for d in self.settings['url_whitelist']])
+
         #If URL is found
         for domain in urls:
+            domain = domain.lower()
             #URL log
             logger.debug('%r: URL detected at {}'.format(domain), event.event_id)
 
-            #If domain is not in whitelist
-            if not domain in self.settings['url_whitelist']:
+            parts = domain.split('.')
+            if parts[1] in FILE_EXTENSIONS:
+                continue
 
+            #If domain is not in whitelist
+            if not domain in lower_domains:
                 #Channel with new moderator
                 #contactChan = self.scBot.api_call('im.open', user = userID)['channel']['id']
 
