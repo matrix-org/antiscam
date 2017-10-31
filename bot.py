@@ -42,8 +42,12 @@ class BotHandler(object):
         if 'admins' in settings:
             admins = settings['admins']
 
-        if userid not in admins:
-            cli.send_plaintext_notice(roomid, "url command only usable by admin")
+        mods = []
+        if 'mods' in settings:
+            mods = settings['mods']
+
+        if userid not in admins and userid not in mods:
+            cli.send_plaintext_notice(roomid, "url command only usable by admin or mod")
             return
             
         whitelist = []
