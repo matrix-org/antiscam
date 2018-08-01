@@ -50,6 +50,7 @@ class AntiScamSpamChecker(object):
                                           'youtube.com','hackingdistributed.com','ens.domains','bittrex.com',
                                           'consensys.net','forbes.com','coinmarketcap.com','liqui.io',
                                           'hitbtc.com']
+        self.settings['url_blacklist'] = []
         self.settings['check_wallet_address'] = True
         self.settings['check_event_keys'] = True
         self.settings['check_sender'] = True
@@ -242,9 +243,13 @@ class AntiScamSpamChecker(object):
         urls = re.findall(regex, event.content['body'])
 
         bad_domains = []
+        check_whitelist = False
 
-        lower_domains = list([d.lower() for d in self.settings['url_whitelist']])
-
+        if len(self.settings['url_whitelist']) > 0:
+            check_whitelist = True
+            lower_whitelist_domains = list([d.lower() for d in self.settings['url_whitelist']])
+        
+        lower_blacklist_domains = list([d.lower() for d in self.settings['url_blacklist']])
         #If URL is found
         for domain in urls:
             domain = domain.lower()
@@ -256,7 +261,7 @@ class AntiScamSpamChecker(object):
                 continue
 
             #If domain is not in whitelist
-            if not domain in lower_domains:
+            if check_whitelist and (domain not in lower_whitelist_domains):
                 #Channel with new moderator
                 #contactChan = self.scBot.api_call('im.open', user = userID)['channel']['id']
 
@@ -273,6 +278,9 @@ class AntiScamSpamChecker(object):
                 #Deleting message
                 #self.delete(data)
 
+                bad_domains.append(domain)
+
+            if domain in lower_blacklist_domains:
                 bad_domains.append(domain)
 
         return bad_domains
