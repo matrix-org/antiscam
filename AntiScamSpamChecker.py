@@ -52,6 +52,7 @@ class AntiScamSpamChecker(object):
                                           'hitbtc.com']
         self.settings['check_wallet_address'] = True
         self.settings['check_event_keys'] = True
+        self.settings['check_sender'] = True
         self.settings.update(config)
 
         reactor.callWhenRunning(self.update_settings)
@@ -86,7 +87,7 @@ class AntiScamSpamChecker(object):
         if self.settings['check_event_keys'] and not hasattr(event, "content") or "body" not in event.content:
             return False
 
-        if self.isAdmin(event.sender) or self.isMod(event.sender) or self.isBot(event.sender):
+        if self.settings['check_sender'] and self.isAdmin(event.sender) or self.isMod(event.sender) or self.isBot(event.sender):
             return False
 
         bad_domains = self.badURLDomains(event)
