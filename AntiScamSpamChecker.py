@@ -50,11 +50,15 @@ class AntiScamSpamChecker(object):
                                           'youtube.com','hackingdistributed.com','ens.domains','bittrex.com',
                                           'consensys.net','forbes.com','coinmarketcap.com','liqui.io',
                                           'hitbtc.com']
-        self.settings['url_blacklist'] = []
-        self.settings['check_wallet_address'] = True
-        self.settings['check_event_keys'] = True
-        self.settings['check_sender'] = True
         self.settings.update(config)
+
+        # self.settings.update does a plain copy of the settings from the file,
+        # so the values above will be overwritten even if not present.
+        self.settings['check_wallet_address'] = self.settings.get('check_wallet_address', False)
+        self.settings['check_event_keys'] = self.settings.get('check_event_keys', False)
+        self.settings['check_sender'] = self.settings.get('check_sender', False)
+        self.settings['url_whitelist'] = self.settings.get('url_whitelist', [])
+        self.settings['url_blacklist'] = self.settings.get('url_blacklist', [])
 
         reactor.callWhenRunning(self.update_settings)
 
