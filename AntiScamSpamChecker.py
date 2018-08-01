@@ -50,6 +50,7 @@ class AntiScamSpamChecker(object):
                                           'youtube.com','hackingdistributed.com','ens.domains','bittrex.com',
                                           'consensys.net','forbes.com','coinmarketcap.com','liqui.io',
                                           'hitbtc.com']
+        self.settings['check_wallet_address'] = True
         self.settings['check_event_keys'] = True
         self.settings.update(config)
 
@@ -90,7 +91,7 @@ class AntiScamSpamChecker(object):
 
         bad_domains = self.badURLDomains(event)
 
-        if self.isETH_BTC(event):
+        if self.settings['check_wallet_address'] and self.isETH_BTC(event):
             return "Wallet addresses are not permitted"
         elif bad_domains:
             return "Message contains links to prohibited domains: %s" % (','.join(bad_domains),)
