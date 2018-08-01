@@ -52,6 +52,14 @@ class AntiScamSpamChecker(object):
                                           'hitbtc.com']
         self.settings.update(config)
 
+        # self.settings.update does a plain copy of the settings from the file,
+        # so the values above will be overwritten even if not present.
+        self.settings['check_wallet_address'] = self.settings.get('check_wallet_address', False)
+        self.settings['check_event_keys'] = self.settings.get('check_event_keys', False)
+        self.settings['check_sender'] = self.settings.get('check_sender', False)
+        self.settings['url_whitelist'] = self.settings.get('url_whitelist', [])
+        self.settings['url_blacklist'] = self.settings.get('url_blacklist', [])
+
         reactor.callWhenRunning(self.update_settings)
 
     @defer.inlineCallbacks
@@ -81,15 +89,15 @@ class AntiScamSpamChecker(object):
         return config
     
     def check_event_for_spam(self, event):
-        if not hasattr(event, "content") or "body" not in event.content:
+        if self.settings['check_event_keys'] and not hasattr(event, "content") or "body" not in event.content:
             return False
 
-        if self.isAdmin(event.sender) or self.isMod(event.sender) or self.isBot(event.sender):
+        if self.settings['check_sender'] and self.isAdmin(event.sender) or self.isMod(event.sender) or self.isBot(event.sender):
             return False
 
         bad_domains = self.badURLDomains(event)
 
-        if self.isETH_BTC(event):
+        if self.settings['check_wallet_address'] and self.isETH_BTC(event):
             return "Wallet addresses are not permitted"
         elif bad_domains:
             return "Message contains links to prohibited domains: %s" % (','.join(bad_domains),)
@@ -239,9 +247,13 @@ class AntiScamSpamChecker(object):
         urls = re.findall(regex, event.content['body'])
 
         bad_domains = []
+        check_whitelist = False
 
-        lower_domains = list([d.lower() for d in self.settings['url_whitelist']])
-
+        if len(self.settings['url_whitelist']) > 0:
+            check_whitelist = True
+            lower_whitelist_domains = list([d.lower() for d in self.settings['url_whitelist']])
+        
+        lower_blacklist_domains = list([d.lower() for d in self.settings['url_blacklist']])
         #If URL is found
         for domain in urls:
             domain = domain.lower()
@@ -253,7 +265,7 @@ class AntiScamSpamChecker(object):
                 continue
 
             #If domain is not in whitelist
-            if not domain in lower_domains:
+            if check_whitelist and (domain not in lower_whitelist_domains):
                 #Channel with new moderator
                 #contactChan = self.scBot.api_call('im.open', user = userID)['channel']['id']
 
@@ -270,6 +282,9 @@ class AntiScamSpamChecker(object):
                 #Deleting message
                 #self.delete(data)
 
+                bad_domains.append(domain)
+
+            if domain in lower_blacklist_domains:
                 bad_domains.append(domain)
 
         return bad_domains
