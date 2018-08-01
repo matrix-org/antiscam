@@ -50,6 +50,7 @@ class AntiScamSpamChecker(object):
                                           'youtube.com','hackingdistributed.com','ens.domains','bittrex.com',
                                           'consensys.net','forbes.com','coinmarketcap.com','liqui.io',
                                           'hitbtc.com']
+        self.settings['check_event_keys'] = True
         self.settings.update(config)
 
         reactor.callWhenRunning(self.update_settings)
@@ -81,7 +82,7 @@ class AntiScamSpamChecker(object):
         return config
     
     def check_event_for_spam(self, event):
-        if not hasattr(event, "content") or "body" not in event.content:
+        if self.settings['check_event_keys'] and not hasattr(event, "content") or "body" not in event.content:
             return False
 
         if self.isAdmin(event.sender) or self.isMod(event.sender) or self.isBot(event.sender):
