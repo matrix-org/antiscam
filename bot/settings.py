@@ -24,7 +24,7 @@ def get():
 def load():
     global settings
     try:
-        settings = yaml.load(open('settings.yaml'))
+        settings = yaml.load(open('config/settings.yaml'))
     except IOError:
         settings = {}
 
