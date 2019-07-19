@@ -143,7 +143,7 @@ logging.basicConfig()
 private_settings = {}
 
 try:
-    with open('privsettings.yaml') as f:
+    with open('config/privsettings.yaml') as f:
         private_settings = yaml.load(f)
     tok = private_settings['token']
 except:
